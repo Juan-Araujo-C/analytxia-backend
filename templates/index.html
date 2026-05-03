@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytxia | Dashboard Premium</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo-text">Analytxia</div>
+        <div>
+            <a href="/historial" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">Ver Historial</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <div class="card">
+            <div class="header-title">Auditoría Estratégica de Cuenta</div>
+            <form method="POST" action="/" class="form-row">
+                <input type="text" name="account_id" class="input-premium" placeholder="ID de la Cuenta Meta (Ej: 1269828...)" required>
+                <select name="estado_filtro" class="input-premium" style="flex: 0.5; min-width: 150px;">
+                    <option value="ACTIVE">🟢 Solo Activas</option>
+                    <option value="PAUSED">⏸️ Solo Pausadas</option>
+                    <option value="ALL">📊 Histórico Completo</option>
+                </select>
+                <button type="submit" class="btn-premium">Auditar con IA ✨</button>
+            </form>
+        </div>
+
+        {% if buscado %}
+        
+        {% if pdf_link %}
+        <div style="text-align: right; margin-bottom: 1rem;">
+            <a href="{{ url_for('static', filename='reports/' + pdf_link) }}" target="_blank" class="btn-premium" style="background: var(--border-color); display: inline-block; text-decoration: none;">📄 Descargar Reporte PDF</a>
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <div class="header-title">🧠 Reporte Ejecutivo Analytxia</div>
+            <div class="ia-report-box">
+                {{ reporte }}
+            </div>
+        </div>
+
+        {% if data %}
+        <div class="card" style="overflow-x: auto;">
+            <div class="header-title">Métricas de Performance por Campaña</div>
+            <table class="table-premium">
+                <thead>
+                    <tr>
+                        <th>Campaña</th>
+                        <th>Objetivo</th>
+                        <th>Inversión</th>
+                        <th>Impresiones</th>
+                        <th>CTR</th>
+                        <th>Resultados</th>
+                        <th>Costo x Result.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data %}
+                    <tr>
+                        <td style="font-weight: 500;">{{ row.name }}</td>
+                        <td><span class="status-badge" style="background: rgba(139, 92, 246, 0.1); color: var(--accent);">{{ row.objetivo }}</span></td>
+                        <td style="color: #ef4444;">{{ row.spend }}</td>
+                        <td>{{ row.impressions }}</td>
+                        <td>{{ row.ctr }}</td>
+                        <td style="font-weight: 600;">{{ row.resultado_cant }} <br><span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">{{ row.resultado_tipo }}</span></td>
+                        <td style="color: var(--primary); font-weight: 600;">{{ row.costo_resultado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="header-title">💬 Consultoría en Tiempo Real</div>
+            <div class="chat-box">
+                <div id="chat-history" style="min-height: 100px; max-height: 300px; overflow-y: auto; padding: 1rem; background: var(--bg-dark); border-radius: 8px; border: 1px solid var(--border-color); color: var(--text-muted);">
+                    Las respuestas de Analytxia aparecerán acá...
+                </div>
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chat-input" class="input-premium" placeholder="Preguntale algo sobre estos datos a Analytxia...">
+                    <button onclick="enviarMensagem()" class="btn-premium" style="background: var(--bg-dark); border: 1px solid var(--primary); color: var(--primary);">Enviar</button>
+                </div>
+            </div>
+        </div>
+        
+        {% endif %}
+    </div>
+
+    <script>
+        function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            const history = document.getElementById('chat-history');
+            const msg = input.value;
+            if(!msg) return;
+            
+            history.innerHTML += `<div style="margin-bottom: 10px;"><strong>Vos:</strong> ${msg}</div>`;
+            input.value = '';
+            
+            fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({msg: msg})
+            })
+            .then(r => r.json())
+            .then(data => {
+                history.innerHTML += `<div style="margin-bottom: 15px; color: var(--primary);"><strong>Analytxia:</strong> ${data.response}</div>`;
+                history.scrollTop = history.scrollHeight;
+            });
+        }
+    </script>
+</body>
+</html>
