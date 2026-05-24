@@ -4,3 +4,10 @@ __pycache__/
 *.pyc
 .DS_Store
 instance/
+
+# Local databases
+*.db
+*.sqlite3
+
+# Dynamically generated reports
+static/reports/*.pdf
