@@ -9,7 +9,7 @@ from database import guardar_auditoria, crear_tablas, obtener_todas_las_auditori
 
 load_dotenv()
 app = Flask(__name__)
-app.secret_key = 'analytixa_full_key_2026'
+app.secret_key = os.getenv('SECRET_KEY')
 crear_tablas()
 
 @app.route('/', methods=['GET', 'POST'])
